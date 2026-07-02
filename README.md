@@ -77,7 +77,7 @@ lib/app/
 │   └── task_list/
 │       ├── task_list_page.dart    # Gestión visual del CRUD y modales responsivos
 │       └── task_provider.dart     # Orquestador del estado y lógica del negocio
-
+```
 
 ## 📄 Licencia
 
