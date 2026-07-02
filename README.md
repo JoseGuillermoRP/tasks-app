@@ -78,7 +78,7 @@ lib/app/
 │       ├── task_list_page.dart    # Gestión visual del CRUD y modales responsivos
 │       └── task_provider.dart     # Orquestador del estado y lógica del negocio
 
-##📄 Licencia
+### 📄 Licencia
 
 Este proyecto se distribuye bajo la Licencia MIT, permitiendo su uso, modificación y distribución libre de manera abierta. Consulta el archivo LICENSE adjunto para mayores detalles.
 👨‍💻 Autor
