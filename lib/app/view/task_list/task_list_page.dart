@@ -1,13 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:lista_tarea/app/repository/task_repository.dart';
 import 'package:lista_tarea/app/view/components/h1.dart';
 import 'package:lista_tarea/app/view/components/shape.dart';
 import 'package:lista_tarea/app/view/task_list/task_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
-
+import 'package:showcaseview/showcaseview.dart';
 import '../../model/task.dart';
 
 class TaskListPage extends StatelessWidget {
@@ -17,36 +15,95 @@ class TaskListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => TaskProvider()..fetchTasks(),
-      child: Scaffold(
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            _Header(),
-            Expanded(child: _TaskList()),
-          ],
-        ),
-        floatingActionButton: Builder(
-          builder: (context) => FloatingActionButton(
-            onPressed: () => _showNewTaskModal(context),
+      child: ShowCaseWidget(
+        builder: (context) => const _TaskScreen(),
+      ),
+    );
+  }
+}
+
+class _TaskScreen extends StatefulWidget {
+  const _TaskScreen({Key? key}) : super(key: key);
+
+  @override
+  State<_TaskScreen> createState() => _TaskScreenState();
+}
+
+class _TaskScreenState extends State<_TaskScreen> {
+  final GlobalKey _addKey = GlobalKey();
+  final GlobalKey _taskKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 800), () {
+        if(mounted){
+          final provider = context.read<TaskProvider>();
+          if (!provider.isTutorialDone && provider.taskList.isEmpty) {
+            ShowCaseWidget.of(context).startShowCase([_addKey]);
+          }
+        }
+      });
+    });
+  }
+
+  void _showNewTaskModal(BuildContext context) async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => ChangeNotifierProvider.value(
+        value: context.read<TaskProvider>(),
+        child: const _NewTaskModal(),
+      ),
+    );
+
+    if(!mounted) return;
+    final provider = context.read<TaskProvider>();
+
+    if(!provider.isTutorialDone && provider.taskList.isNotEmpty){
+      Future.delayed(const Duration(milliseconds: 600), () {
+        if(mounted){
+          ShowCaseWidget.of(context).startShowCase([_taskKey]);
+          provider.completeTutorial();
+        }
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const _Header(),
+          Expanded(child: _TaskList(taskKey: _taskKey)),
+        ],
+      ),
+      floatingActionButton: Builder(
+        builder: (context) => Showcase(
+          key: _addKey,
+          title: '¡Empieza aquí!',
+          description: 'Toca el botón para crear tu primera tarea 👆',
+          tooltipBackgroundColor: Theme.of(context).colorScheme.primary,
+          textColor: Colors.white,
+          targetShapeBorder: const CircleBorder(),
+          disposeOnTap: true,
+          onTargetClick: () {
+            _showNewTaskModal(context);
+          },
+          child: FloatingActionButton(
+            onPressed: () {
+              _showNewTaskModal(context);
+            },
             child: const Icon(Icons.add, size: 50),
           ),
         ),
       ),
     );
   }
-
-  void _showNewTaskModal(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (_) => ChangeNotifierProvider.value(
-        value: context.read<TaskProvider>(),
-        child: _NewTaskModal(),
-      ),
-    );
-  }
 }
-
 
 class _NewTaskModal extends StatefulWidget {
   const _NewTaskModal({super.key});
@@ -55,7 +112,7 @@ class _NewTaskModal extends StatefulWidget {
   State<_NewTaskModal> createState() => _NewTaskModalState();
 }
 
-class _NewTaskModalState extends State<_NewTaskModal>{
+class _NewTaskModalState extends State<_NewTaskModal> {
   late final TextEditingController _controller;
 
   @override
@@ -63,11 +120,13 @@ class _NewTaskModalState extends State<_NewTaskModal>{
     super.initState();
     _controller = TextEditingController();
   }
+
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -80,12 +139,12 @@ class _NewTaskModalState extends State<_NewTaskModal>{
           borderRadius: BorderRadius.vertical(top: Radius.circular(21)),
           color: Colors.white,
         ),
-        child:SingleChildScrollView(
+        child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              H1('Nueva Tarea'),
+              const H1('Nueva Tarea'),
               const SizedBox(height: 26),
               TextField(
                 controller: _controller,
@@ -109,21 +168,15 @@ class _NewTaskModalState extends State<_NewTaskModal>{
                     Navigator.of(context).pop();
                   }
                 },
-                child: Text('Guardar'),
+                child: const Text('Guardar'),
               ),
             ],
           ),
-        )
-
+        ),
       ),
     );
   }
 }
-
-
-
-
-
 
 class _EditTaskModal extends StatefulWidget {
   const _EditTaskModal({super.key, required this.task});
@@ -202,9 +255,9 @@ class _EditTaskModalState extends State<_EditTaskModal> {
 }
 
 class _TaskList extends StatelessWidget {
-  const _TaskList({Key? key}) : super(key: key);
+  const _TaskList({Key? key, this.taskKey}) : super(key: key);
+  final GlobalKey? taskKey;
 
-  // Mueve el método aquí adentro
   void _editTask(BuildContext context, Task task) {
     showModalBottomSheet(
       context: context,
@@ -236,73 +289,37 @@ class _TaskList extends StatelessWidget {
                         Text('👋', style: TextStyle(fontSize: 60)),
                         SizedBox(height: 16),
                         Text(
-                          'Empecemos',
+                          'Tu lista está vacía',
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Toca el botón + abajo\npara crear tu primera tarea.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 16, color: Colors.grey),
-                        ),
-                        SizedBox(height: 40),
-                        Icon(
-                          Icons.arrow_downward,
-                          size: 40,
-                          color: Colors.grey,
-                        ),
+                        SizedBox(height: 80),
+
                       ],
                     ),
                   );
                 }
-                
+
                 return Column(
                   children: [
-                    if(!provider.isTutorialDone)
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 20),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(16),
-                          border:Border.all(color: Theme.of(context).colorScheme.primary),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text('🎉 ¡Gran trabajo!', style: TextStyle(fontWeight:FontWeight.bold, fontSize:18)),
-                            const SizedBox(height: 10),
-                            const Text('👆 Toca el cuadro izquierdo para completarla.'),
-                            const SizedBox(height: 6),
-                            const Text('↔️ Desliza la tarea hacia los lados para Editar o Borrar.'),
-                            const SizedBox(height: 12),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: ElevatedButton(
-                                onPressed: ()=> provider.completeTutorial(),
-                                child: const Text('¡Entendido!'),
-                              ),
-                            )
-                          ],
-                        ),
+                    Expanded(
+                      child: ListView.separated(
+                          itemCount: provider.taskList.length,
+                          separatorBuilder: (_, __) => const SizedBox(height: 16),
+                          itemBuilder: (_, index) {
+                            final isFirst = index == 0 && !provider.isTutorialDone;
+                            return _TaskITem(
+                              provider.taskList[index],
+                              showcaseKey: isFirst ? taskKey : null,
+                              onTap: () => provider.onTaskDoneChange(provider.taskList[index]),
+                              onDelete: () => provider.deleteTask(provider.taskList[index]),
+                              onEdit: () => _editTask(context, provider.taskList[index]),
+                            );
+                          }
                       ),
-                Expanded(
-                child: ListView.separated(
-                itemCount: provider.taskList.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 16),
-                itemBuilder: (_, index) => _TaskITem(
-                provider.taskList[index],
-                onTap: () =>
-                provider.onTaskDoneChange(provider.taskList[index]),
-                onDelete: () =>
-                provider.deleteTask(provider.taskList[index]),
-                onEdit: () => _editTask(context, provider.taskList[index]),
-                ),
-                ),
-                ),
+                    ),
                   ],
                 );
               },
@@ -344,23 +361,24 @@ class _Header extends StatelessWidget {
 }
 
 class _TaskITem extends StatelessWidget {
-  const _TaskITem(
-    this.task, {
+  const _TaskITem(this.task, {
     super.key,
     this.onTap,
     this.onDelete,
     this.onEdit,
+    this.showcaseKey,
   });
 
   final Task task;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
   final VoidCallback? onEdit;
+  final GlobalKey? showcaseKey;
 
   @override
   Widget build(BuildContext context) {
-    return Dismissible(
-      key: Key(task.title),
+    Widget itemContent = Dismissible(
+      key: UniqueKey(),
       direction: DismissDirection.horizontal,
       confirmDismiss: (direction) async {
         if (direction == DismissDirection.startToEnd) {
@@ -375,7 +393,6 @@ class _TaskITem extends StatelessWidget {
           if (onDelete != null) onDelete!();
         }
       },
-
       background: Container(
         color: Colors.blue,
         alignment: Alignment.centerLeft,
@@ -388,7 +405,6 @@ class _TaskITem extends StatelessWidget {
         padding: const EdgeInsets.only(right: 20),
         child: const Icon(Icons.delete_outline, color: Colors.white),
       ),
-
       child: GestureDetector(
         onTap: onTap,
         child: Card(
@@ -421,5 +437,20 @@ class _TaskITem extends StatelessWidget {
         ),
       ),
     );
+
+    if (showcaseKey != null) {
+      return Showcase(
+        key: showcaseKey!,
+        title: 'Gestos Mágicos ✨',
+        description: 'Toca para cerrar esta luz y luego desliza tu tarea con el dedo ↔️',
+        targetPadding: const EdgeInsets.all(4),
+        tooltipBackgroundColor: Theme.of(context).colorScheme.primary,
+        textColor: Colors.white,
+        disposeOnTap: true,
+        onTargetClick: () {}, // ✅ ¡LA SOLUCIÓN! Le damos una acción vacía para evitar el error rojo
+        child: itemContent,
+      );
+    }
+    return itemContent;
   }
 }
