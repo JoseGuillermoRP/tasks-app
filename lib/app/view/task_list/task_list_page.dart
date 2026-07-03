@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:lista_tarea/app/view/components/h1.dart';
 import 'package:lista_tarea/app/view/components/shape.dart';
@@ -447,7 +445,7 @@ class _TaskITem extends StatelessWidget {
         tooltipBackgroundColor: Theme.of(context).colorScheme.primary,
         textColor: Colors.white,
         disposeOnTap: true,
-        onTargetClick: () {}, // ✅ ¡LA SOLUCIÓN! Le damos una acción vacía para evitar el error rojo
+        onTargetClick: () {},
         child: itemContent,
       );
     }
