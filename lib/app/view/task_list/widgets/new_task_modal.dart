@@ -4,8 +4,7 @@ import 'package:lista_tarea/app/view/task_list/task_provider.dart';
 import 'package:lista_tarea/app/model/task.dart';
 import 'package:provider/provider.dart';
 
-/// Modal (BottomSheet) para la creación de nuevas tareas.
-/// Debe ser StatefulWidget para poder instanciar y gestionar el TextEditingController.
+/// Modal para la creación de nuevas tareas.
 class NewTaskModal extends StatefulWidget {
   const NewTaskModal({super.key});
 
@@ -24,7 +23,6 @@ class _NewTaskModalState extends State<NewTaskModal> {
 
   @override
   void dispose() {
-    // Fundamental limpiar el controlador para evitar pérdidas de memoria
     _controller.dispose();
     super.dispose();
   }
@@ -32,7 +30,6 @@ class _NewTaskModalState extends State<NewTaskModal> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      // Padding dinámico para que el modal suba si el teclado del dispositivo aparece
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
@@ -51,7 +48,7 @@ class _NewTaskModalState extends State<NewTaskModal> {
               const SizedBox(height: 26),
               TextField(
                 controller: _controller,
-                autofocus: true, // Abre el teclado automáticamente para mejor UX
+                autofocus: true,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.white,
@@ -64,11 +61,8 @@ class _NewTaskModalState extends State<NewTaskModal> {
               const SizedBox(height: 26),
               ElevatedButton(
                 onPressed: () {
-                  // Validación básica para evitar crear tareas vacías
                   if (_controller.text.isNotEmpty) {
                     final task = Task(_controller.text);
-                    // Usamos context.read en lugar de watch porque estamos dentro de un evento
-                    // y solo necesitamos emitir la orden, no escuchar los cambios aquí.
                     context.read<TaskProvider>().addNewTask(task);
                     Navigator.of(context).pop();
                   }

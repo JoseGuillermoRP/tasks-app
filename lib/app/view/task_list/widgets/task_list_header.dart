@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:lista_tarea/app/view/components/h1.dart';
 import 'package:lista_tarea/app/view/components/shape.dart';
 
-/// Un componente meramente visual (StatelessWidget) que encapsula
-/// el diseño superior de la pantalla principal (imagen, fondo y título).
-/// Separar esto mejora la legibilidad del archivo principal.
 class TaskListHeader extends StatelessWidget {
   const TaskListHeader({super.key});
 

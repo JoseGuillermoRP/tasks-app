@@ -4,8 +4,7 @@ import 'package:lista_tarea/app/view/task_list/task_provider.dart';
 import 'package:lista_tarea/app/model/task.dart';
 import 'package:provider/provider.dart';
 
-/// Modal (BottomSheet) para editar una tarea existente.
-/// Requiere la Tarea original para poder pre-poblar el campo de texto.
+/// Modal para editar una tarea existente. Requiere la [task] original.
 class EditTaskModal extends StatefulWidget {
   const EditTaskModal({super.key, required this.task});
 
@@ -21,7 +20,6 @@ class _EditTaskModalState extends State<EditTaskModal> {
   @override
   void initState() {
     super.initState();
-    // Pre-llenamos el TextField con el título actual de la tarea a editar
     _controller = TextEditingController(text: widget.task.title);
   }
 
