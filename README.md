@@ -17,17 +17,26 @@
 
 ### Capturas de Pantalla
 <div align="center">
-  <img src="assets/screenshots/splash_screen.png" width="240" alt="Pantalla de Bienvenida y Onboarding" />
-  <img src="assets/screenshots/empty_state.png" width="240" alt="Estado Vacío / Inicio" />
-  <img src="assets/screenshots/task_list.png" width="240" alt="Lista de Tareas Activa" />
+  <img width="auto" height="300" alt="Captura de pantalla 2026-07-03 193230" src="https://github.com/user-attachments/assets/58bca10a-4fcb-4f4b-9c56-ede6b46ad61f" />
+  <img width="auto" height="300" alt="Captura de pantalla 2026-07-03 193300" src="https://github.com/user-attachments/assets/dc45c2fd-9db4-4f1f-84f9-b33f3013b459" />
+  
+<img width="auto" height="300" alt="Captura de pantalla 2026-07-03 193352" src="https://github.com/user-attachments/assets/1fcc0424-ec59-4d41-a985-cfe723a3a296" />
+  
+
+<img width="auto" height="300" alt="Captura de pantalla 2026-07-03 193526" src="https://github.com/user-attachments/assets/2addffe2-34c8-4381-ba86-4954930a47fe" />
+<img width="auto" height="300" alt="Captura de pantalla 2026-07-03 193415" src="https://github.com/user-attachments/assets/13ce86da-888f-4a56-9218-fe195a44a7b0" />
+
+
+
 </div>
 
 ### 🎬 Video de Funcionamiento
 A continuación, se muestra el flujo completo de la aplicación, incluyendo el comportamiento del onboarding dinámico, la persistencia de datos y las interacciones táctiles:
 
 <div align="center">
+  
+[![▶️Ver Video Demostrativo](https://img.youtube.com/vi/BKttE8YUfhA/0.jpg)](https://youtube.com/shorts/BKttE8YUfhA)
 
-[▶️ Ver Video Demostrativo del Funcionamiento](assets/screenshots/demo_video.mp4)
 
 *(Nota: Si clonas el repositorio, puedes encontrar el archivo de video directamente en la carpeta de recursos visuales).*
 </div>
@@ -70,13 +79,20 @@ lib/app/
 │   └── task.dart                  # Entidad pura de datos (Task)
 ├── repository/
 │   └── task_repository.dart       # Abstracción de persistencia local
-├── view/
-│   ├── components/                # Elementos visuales atómicos (H1, Shape)
-│   ├── splash/
-│   │   └── splash_page.dart       # Control de ciclo de vida y Onboarding inicial
-│   └── task_list/
-│       ├── task_list_page.dart    # Gestión visual del CRUD y modales responsivos
-│       └── task_provider.dart     # Orquestador del estado y lógica del negocio
+└── view/
+    ├── components/                # Elementos visuales atómicos (H1, Shape)
+    ├── home/
+    │   └── home_page.dart         # Vista de inicio/menú principal
+    ├── splash/
+    │   └── splash_page.dart       # Control de ciclo de vida y Onboarding inicial
+    └── task_list/                 # Módulo principal de gestión de tareas
+        ├── widgets/               # Componentes UI refactorizados y modulares
+        │   ├── edit_task_modal.dart 
+        │   ├── new_task_modal.dart
+        │   ├── task_item.dart     # UI de tarea individual con animaciones y gestos
+        │   └── task_list_header.dart
+        ├── task_list_page.dart    # Gestión visual del CRUD y vista principal
+        └── task_provider.dart     # Orquestador del estado y lógica del negocio
 ```
 
 ## 📄 Licencia
