@@ -13,6 +13,14 @@
 
 ---
 
+
+### 📥 Descarga e Instalación
+
+[👉 **Descargar el APK de la última versión aquí**](https://github.com/JoseGuillermoRP/tasks-app/releases/tag/apk)
+
+
+---
+
 ## 📸 Demostración Visual
 
 ### Capturas de Pantalla
